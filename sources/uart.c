@@ -12,4 +12,5 @@ void uart_poll_send(uint8_t *data, uint32_t size)
 
 uint32_t uart_pool_read(uint8_t *data, uint32_t size)
 {
+    return 0;
 }
