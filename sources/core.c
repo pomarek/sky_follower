@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdbool.h>
 #include <stm32f0xx.h>
 #include "system_stm32f0xx.h"
 #include "core.h"
@@ -8,7 +9,72 @@
 
 #define CLOCK_SOURCE_PLL 2
 
+#define DEVICE_ID2BUS_ID(DEV) ((bus_id_t)(((DEV)>>8)&3))
+#define DEVICE_HAS_RESET(DEV) ((DEV) & 0x010000)
+#define DEVICE_INDEX(DEV)     ((DEV)&0x1F)
+typedef enum
+{
+    BUS_ID_AHB =0,
+    BUS_ID_APB2 =1,
+    BUS_ID_APB1 =2
+}bus_id_t;
 
+
+void power_on_device(device_id_t dev)
+{
+    bus_id_t bus;
+    volatile uint32_t *clk_reg, *reset_reg;
+    
+    bus = DEVICE_ID2BUS_ID(dev);
+    switch(bus)
+    {
+        case BUS_ID_AHB:
+            clk_reg = &(RCC->AHBENR);
+            reset_reg = &(RCC->AHBRSTR);
+            break;
+        case BUS_ID_APB2:
+            clk_reg = &(RCC->APB2ENR);
+            reset_reg = &(RCC->APB2RSTR);
+            break;
+        case BUS_ID_APB1:
+            clk_reg = &(RCC->APB1ENR);
+            reset_reg = &(RCC->APB1RSTR);
+            break;
+        default:
+            return;
+    }
+    
+    *clk_reg |= 1<<DEVICE_INDEX(dev);
+    if(DEVICE_HAS_RESET(dev))
+    {
+        *reset_reg &= ~(1<<DEVICE_INDEX(dev));
+    }
+    
+}
+void power_off_device(device_id_t dev)
+{
+    //does not put device into reset
+    bus_id_t bus;
+    volatile uint32_t *clk_reg;
+    
+    bus = DEVICE_ID2BUS_ID(dev);
+    switch(bus)
+    {
+        case BUS_ID_AHB:
+            clk_reg = &(RCC->AHBENR);
+            break;
+        case BUS_ID_APB2:
+            clk_reg = &(RCC->APB2ENR);
+            break;
+        case BUS_ID_APB1:
+            clk_reg = &(RCC->APB1ENR);
+            break;
+        default:
+            return;
+    }
+    
+    *clk_reg &= ~(1<<DEVICE_INDEX(dev));    
+}
 
 static uint32_t calc_pll(clock_source_t source, cpu_speed_t desired_speed)
 {

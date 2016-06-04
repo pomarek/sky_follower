@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stm32f0xx.h>
+#include "core.h"
 #include "gpio.h"
 
 #define PIN_RESET_BIT_OFFSET 16
@@ -38,7 +39,7 @@ void mux_set(gpio_t gpio, mux_function_t func)
 {
     GPIO_TypeDef* regs;
     regs = get_gpio_addr(gpio);
-    RCC->AHBENR |= 1<<(GPIO_BANK(gpio) + GPIO_AHBENR_OFF);
+    
     if(regs)
     {
         uint32_t val, i =0;
@@ -89,6 +90,7 @@ void gpio_set_output_type(gpio_t gpio, gpio_output_type_t output_type)
 
 void gpio_init(gpio_t gpio, gpio_direction_t dir)
 {
+    power_on_device((device_id_t)(GPIO_BANK(gpio) + DEVICE_ID_GPIO_A));
     if(dir == GPIO_DIRECTION_OUT)
     {
         mux_set(gpio, MUX_FUNC_GPIO_OUT);

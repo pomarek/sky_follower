@@ -23,10 +23,46 @@ typedef enum
     CLOCK_SOURCE_EXTERNAL
 } clock_source_t;
 
+//0xXXYYZZ - XX - has reset bit, YY - bus register, ZZ - index in bus register
+typedef enum
+{
+    //AHB
+    DEVICE_ID_DMA       = 0x000000,
+    DEVICE_ID_CRC       = 0x000006,
+    DEVICE_ID_GPIO_A    = 0x010011,
+    DEVICE_ID_GPIO_B    = 0x010012,
+    //DEVICE_ID_GPIO_C    = 0x010013,
+//    DEVICE_ID_GPIO_D    = 0x010014,
+    DEVICE_ID_GPIO_F    = 0x010016,
+    
+    //APB2
+    DEVICE_ID_SYSCFG    = 0x0100,
+    DEVICE_ID_ADC       = 0x0109,
+    DEVICE_ID_TIM1      = 0x010B,
+    DEVICE_ID_SPI       = 0x010C,
+    DEVICE_ID_UART      = 0x010E,
+    DEVICE_ID_TIM15     = 0x0110,
+    DEVICE_ID_TIM16     = 0x0111,
+    DEVICE_ID_TIM17     = 0x0112,
+    DEVICE_ID_DBGMCU    = 0x0116,
+    
+    //APB1
+    DEVICE_ID_TIM3      = 0x0201,
+    DEVICE_ID_TIM6      = 0x0204,
+    DEVICE_ID_TIM7      = 0x0205,
+    DEVICE_ID_TIM14     = 0x0208,
+    DEVICE_ID_WWDG      = 0x020B,
+    DEVICE_ID_I2C       = 0x0215,
+    DEVICE_ID_PWRIF     = 0x021C
+}device_id_t;
+
 int clock_init(clock_source_t source, cpu_speed_t desired_speed);
 int flash_init(void);
 void enable_clock(clock_source_t source);
 void system_reset(void);
+void power_on_device(device_id_t dev);
+void power_off_device(device_id_t dev);
+
 
 
 
