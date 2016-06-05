@@ -183,4 +183,14 @@ void system_reset(void)
     NVIC_SystemReset();
 }
 
+uint32_t init_systic_timer(uint32_t interval, int_handler handler, void* custom_data)
+{
+    interrupt_set_handler(SysTick_IRQn, handler, custom_data);
+    return SysTick_Config(SystemCoreClock/1000000 * interval);
+}
+
+void disable_systic_timer()
+{
+    SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
+}
 

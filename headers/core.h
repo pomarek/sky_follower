@@ -1,8 +1,8 @@
 #ifndef _CORE_H_
     #define _CORE_H_
-
+#include <stdint.h>
 #include "common_macros.h"
-
+#include "interrupt.h"
 #define INTERNAL_CLOCK MHZ(8)
 #define EXTERNAL_CLOCK MHZ(8)
 
@@ -62,6 +62,19 @@ void enable_clock(clock_source_t source);
 void system_reset(void);
 void power_on_device(device_id_t dev);
 void power_off_device(device_id_t dev);
+//WARNING:
+//if SystemCoreClock/1000000 * usec_timeout is greater than 0x00FFFFFF (16 777 215) error will be returned
+//in case longer intervals are needed handler needs to count  how many times it was called
+//MAX TIMEOUTS
+//@48MHz - 0.349s max interval 
+//@40MHz - 0.419s max interval 
+//@32MHz - 0.524s max interval 
+//@24MHz - 0.699s max interval 
+//@16MHz - 1.048s max interval 
+//@ 8MHz - 2.097s max interval 
+uint32_t init_systic_timer(uint32_t interval, int_handler handler, void* custom_data);
+void disable_systic_timer(void);
+
 
 
 

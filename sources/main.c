@@ -9,22 +9,28 @@
 
 void forever_loop()
 {
-    gpio_state_t a = GPIO_STATE_LOW;
     int i;
     while(1)
     {
-        gpio_set(GP_EN, a);
         uart_poll_send(TEXT, sizeof(TEXT));
-        a = (a == GPIO_STATE_LOW)?GPIO_STATE_HIGH:GPIO_STATE_LOW;
         for(i = 0; i < MHZ(4); i++)
             ;
     }
 }
 
+void periodic_int(IRQn_Type id, void * data)
+{
+    gpio_state_t *a = (gpio_state_t*)data;
+    gpio_set(GP_EN, *a);
+    *a = (*a == GPIO_STATE_LOW)?GPIO_STATE_HIGH:GPIO_STATE_LOW;
+}
+
 int main(void)
 {
+    gpio_state_t a = GPIO_STATE_LOW;
     system_init();
     per_init();
+    init_systic_timer(333333, periodic_int, &a);
     forever_loop();
     system_reset();
     return 0;
