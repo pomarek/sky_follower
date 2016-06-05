@@ -174,6 +174,7 @@ int clock_init(clock_source_t source, cpu_speed_t desired_speed)
 
 int flash_init(void)
 {
+    //no flash accelerators on this device
     return 0;
 }
 
