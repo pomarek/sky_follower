@@ -8,5 +8,6 @@ typedef enum
 } debug_mode_t;
 
 void debug_init(debug_mode_t mode);
+void log_print(char * format, ...);
 
 #endif //_DEBUG_H_

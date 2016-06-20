@@ -7,6 +7,7 @@
 #include "uart.h"
 #include "stepper_drv.h"
 #include "buttons.h"
+#include "debug.h"
 
 #define TEXT "some test text\r\n"
 extern int run;
@@ -15,7 +16,7 @@ void forever_loop()
 {
     while(1)
     {
-        uart_poll_send(TEXT, sizeof(TEXT));
+        log_print(TEXT);
         sleep(5000);
     }
 }
@@ -58,6 +59,7 @@ int main(void)
 {
     system_init();
     per_init();
+    debug_init(DEBUG_MODE_UART);
     buttons_enable(BTN_UP, btn_up_handler);
     buttons_enable(BTN_DOWN, btn_down_handler);
     buttons_enable(BTN_START, btn_start_handler);
