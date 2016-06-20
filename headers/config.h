@@ -32,9 +32,9 @@
 #define BTN_END_1   GP_A0
 #define BTN_END_2   GP_A1
 
-#define BTN_UP      GP_A3
+#define BTN_START   GP_A3
 #define BTN_DOWN    GP_A5
-#define BTN_START   GP_A6
+#define BTN_UP      GP_A6
 
 //SHUTTER
 #define SHUTTER_RELEASE GP_A14 // shared with swd 

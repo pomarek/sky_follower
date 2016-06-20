@@ -32,10 +32,12 @@ static int scan_buttons(uint64_t time, void* data)
         if(handlers[i])
         {
             gpio_state_t st = gpio_get(i);
+            
             if(st == states[i].last_state)
             {
                 if(states[i].counter <= BTN_REPEAT_CT)
                     states[i].counter++;
+                
                 if(BTN_REPEAT_CT == states[i].counter)
                     handlers[i](i, st);
             }
@@ -58,9 +60,12 @@ void buttons_enable(gpio_t button_pin, button_handler_t handler)
 {
     if(handler)
     {
-        handlers[button_pin] = handler;
+        mux_set(button_pin, MUX_FUNC_GPIO_IN);
+        gpio_set_pullup(button_pin, GPIO_STATE_HIGH);
         states[button_pin].last_state = gpio_get(button_pin);
         states[button_pin].counter = BTN_REPEAT_CT + 1;
+        handlers[button_pin] = handler;
+        
     }
     else
     {

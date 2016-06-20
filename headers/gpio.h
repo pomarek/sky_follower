@@ -34,8 +34,8 @@ typedef enum
 
 typedef enum
 {
-    GPIO_STATE_LOW,
-    GPIO_STATE_HIGH
+    GPIO_STATE_LOW = 0,
+    GPIO_STATE_HIGH = 1
 } gpio_state_t;
 
 typedef enum
