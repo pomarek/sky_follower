@@ -1,9 +1,10 @@
 #ifndef _GPIO_H_
     #define _GPIO_H_
 
-#define GPIO_BANK(GPIO) ((GPIO)>>8)
-#define GPIO_PIN(GPIO) ((GPIO)&0x00FF)
-#define GPIO_GPIO(BANK, PIN) (((BANK)<<8) +(PIN))
+#define MAX_PIN_ON_PORT 16
+#define GPIO_BANK(GPIO) ((GPIO)>>4) //max 16 pins per port allowed
+#define GPIO_PIN(GPIO) ((GPIO)&0x000F)
+#define GPIO_GPIO(BANK, PIN) (((BANK)<<4) +(PIN))
 
 typedef enum
 {
@@ -19,9 +20,10 @@ typedef enum
     GP_A10 = GPIO_GPIO(0, 10),//UART_RX, TIM1_CH3, TIM17_BKIN
     GP_A13 = GPIO_GPIO(0, 13), //SWDIO - debug interface, can be used after uart debug implementation, IR_OUT
     GP_A14 = GPIO_GPIO(0, 14), //SWDCLK - debug interface, can be used after uart debug implementation, UART_TX
-    GP_B1 = GPIO_GPIO(1, 1) //TIM3_CH4, TIM14_CH1, TIM1_CH3N, ADC_IN9
+    GP_B1 = GPIO_GPIO(1, 1), //TIM3_CH4, TIM14_CH1, TIM1_CH3N, ADC_IN9
     //PF0, XTAL - used for external clock
     //PF1, XTAL - used for external clock
+    GP_MAX_COUNT// +1 to max gpio id - allows array creation for each gpio
 } gpio_t;
 
 typedef enum
