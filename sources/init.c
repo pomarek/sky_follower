@@ -78,7 +78,6 @@ static void periodic_int(IRQn_Type id, void * data)
 {
     current_time++;
     handle_timeouts();
-    stepper_step();
 }
 
 

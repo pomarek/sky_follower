@@ -8,9 +8,9 @@
 #define CLOCK_SOURCE CLOCK_SOURCE_EXTERNAL
 
 //MOTOR
-#define GP_EN       GP_A4 //common
-#define GP_DIR1     GP_A2 //motor 1
-#define GP_STEP1    GP_B1 //motor 1
+#define GP_EN       GP_A4 
+#define GP_DIR1     GP_A2 
+#define GP_STEP1    GP_B1 //requires also other changes so it is placed here just for information, to make it configurable SW mode needs to be used instead of HW
 
 
 //UART
