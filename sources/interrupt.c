@@ -9,6 +9,10 @@
 static int_handler handlers[INTERRUPT_MAX];
 static void* data_list[INTERRUPT_MAX];
 
+__weak void unasigned_handler(IRQn_Type id) 
+{
+}
+
 void interrupt_enable(IRQn_Type id)
 {
     NVIC_EnableIRQ(id);
@@ -28,6 +32,8 @@ void interrupt_set_handler(IRQn_Type id, int_handler handler, void* data)
     data_list[index] = data;
 }
 
+
+
 static void DefaultIntHandler(IRQn_Type id)
 {
     uint32_t index = INTERRUPT_GET_ARRAY_INDEX(id);
@@ -37,6 +43,7 @@ static void DefaultIntHandler(IRQn_Type id)
     }
     else
     {
+        unasigned_handler(id);
         while(1)
             ;
     }

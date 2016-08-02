@@ -73,6 +73,21 @@ void buttons_enable(gpio_t button_pin, button_handler_t handler)
     }
 }
 
+gpio_state_t buttons_get_state(gpio_t button_pin)
+{
+    gpio_state_t prev_state;
+    gpio_state_t new_state = gpio_get(button_pin);
+    
+    do//simple debouncing
+    {
+        prev_state = new_state;
+        sleep(10);
+        new_state = gpio_get(button_pin);
+    }while(prev_state != new_state);
+    
+    return prev_state;
+}
+
 void buttons_disable(gpio_t button_pin)
 {
     handlers[button_pin] = NULL;

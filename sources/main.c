@@ -7,7 +7,19 @@
 #include "uart.h"
 #include "stepper_drv.h"
 #include "buttons.h"
+#include "commands.h"
 #include "debug.h"
+
+//TODO LIST:
+//1. uart control
+//   - on/off
+//   - speed/dir
+//   - home
+//   - debug control
+//   - precise move
+//2. endstop support
+//3. angular speed
+//4. reset log
 
 
 typedef enum
@@ -44,125 +56,101 @@ static void handle_buttons(void)
 
 void forever_loop()
 {
+    
     while(1)
+    {
+        char buf[20];
+        int read;
+        read = uart_iread(buf, 20);
+        uart_isend(buf, read);
         handle_buttons();
+        //commands_process();
+    }
 }
-#define MIN(X, Y) ((X)>(Y)?(Y):(X))
-#define MAX_DEL 12000
-static uint32_t calc_delay(void)
+
+static void dir_button_handler(gpio_state_t state, stepper_dir_t dir)
 {
-    if(delay>MAX_DEL)
-    {
-        if(delay > (MAX_DEL<<1) -2)
-            delay = (MAX_DEL<<1) -2;
-        return (MAX_DEL<<1) - delay;
-        
-    }
-    else if(delay <2)
-    {
-        return 2;
-    }
-    else if(delay<MAX_DEL)
-    {
-        return delay;
-    }
+    if( state == GPIO_STATE_LOW)
+        stepper_start_ex(2000, 0, dir);
     else
-    {
-        return MAX_DEL;
-    }
-}
-
-static stepper_dir_t calc_dir(void)
-{
-    return delay>MAX_DEL?STEPPER_DIR_THIS:STEPPER_DIR_OTHER;
-}
-
-int step(void)
-{
-    uint32_t delay_tmp = calc_delay();
-    if(delay_tmp >(MAX_DEL>>2))
-    {
-        return 1000;
-    }
-    if(delay_tmp >10)
-    {
-        return (delay_tmp>>2);
-    }
-    return 1;
+        stepper_stop();
 }
 
 static void btn_up_handler(void)
 {
-    uint32_t delay_tmp;
-    stepper_dir_t dir = calc_dir();
-    delay += step();
-    delay_tmp = calc_delay();
-    log_print("up %d \r\n", delay_tmp);
-    
-    if(dir != calc_dir())
-        stepper_update_dir(calc_dir());
-    stepper_update_delay(delay_tmp);
+    log_print(LOG_INFO, "btn up\r\n");
+    dir_button_handler(buttons_get_state(BTN_UP), STEPPER_DIR_THIS);
 }
 
 static void btn_down_handler(void)
 {
-    uint32_t delay_tmp;
-    stepper_dir_t dir = calc_dir();
-    delay -= step();
-    delay_tmp = calc_delay();
-    log_print("down %d \r\n", delay_tmp);
-    
-    if(dir != calc_dir())
-        stepper_update_dir(calc_dir());
-    stepper_update_delay(delay_tmp);
-
+    log_print(LOG_INFO, "btn down\r\n");
+    dir_button_handler(buttons_get_state(BTN_DOWN), STEPPER_DIR_OTHER);
 }
 
 static void btn_start_handler(void)
 {
-    static int aaaa = 0;
-    if(aaaa == 0)
-    {
-        delay = MAX_DEL;
-        stepper_start(calc_delay(), calc_dir());
-        aaaa = 1;
-        log_print("start\r\n");
-    }
-    else
-    {
-        stepper_stop();
-        aaaa = 0;
-        log_print("stop\r\n");
-    }
+    uart_isend("aaa\r\n", 5);
 }
 
 void generic_btn_handler(gpio_t button_pin, gpio_state_t state)
 {
     //this is interrupt so let's not make much here
-    if(state == GPIO_STATE_LOW)
+    switch(button_pin)
     {
-        switch(button_pin)
-        {
-            case BTN_DOWN:
-                btn_status |= BIT(BUTTON_DOWN);
-                break;
-            case BTN_UP:
-                btn_status |= BIT(BUTTON_UP);
-                break;
-            case BTN_START:
-                btn_status |= BIT(BUTTON_START);
-                break;
-            default:
-                break;
-        }
+        case BTN_DOWN:
+            btn_status |= BIT(BUTTON_DOWN);
+            break;
+        case BTN_UP:
+            btn_status |= BIT(BUTTON_UP);
+            break;
+        case BTN_START:
+            btn_status |= BIT(BUTTON_START);
+            break;
+        default:
+            break;
     }
+}
+
+bool set_speed_command(char * params)
+{
+    log_print(LOG_TRACE, "func %s, param %s\r\n", __FUNCTION__, params);
+    return true;
+}
+
+bool start_command(char * params)
+{
+    log_print(LOG_TRACE, "func %s, param %s\r\n", __FUNCTION__, params);
+    return true;
+}
+
+bool stop_command(char *params)
+{
+    log_print(LOG_TRACE, "func %s, param %s\r\n", __FUNCTION__, params);
+    return true;
+}
+bool move_command(char *params)
+{
+    log_print(LOG_TRACE, "func %s, param %s\r\n", __FUNCTION__, params);
+    return true;
+}
+bool home_command(char *params)
+{
+    log_print(LOG_TRACE, "func %s, param %s\r\n", __FUNCTION__, params);
+    return true;
+}
+
+bool debug_level_command(char *params)
+{
+    log_print(LOG_TRACE, "func %s, param %s\r\n", __FUNCTION__, params);
+    return true;
 }
 
 int main(void)
 {
     system_init();
     per_init();
-    debug_init(DEBUG_MODE_UART);
+    debug_init(DEBUG_MODE_UART, LOG_DEBUG);
     buttons_enable(BTN_UP, generic_btn_handler);
     buttons_enable(BTN_DOWN, generic_btn_handler);
     buttons_enable(BTN_START, generic_btn_handler);

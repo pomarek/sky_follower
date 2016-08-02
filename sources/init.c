@@ -5,6 +5,7 @@
 #include "uart.h"
 #include "stepper_drv.h"
 #include "buttons.h"
+#include "commands.h"
 #include "config.h"
 
 #define HANDLERS_NUM 5
@@ -80,6 +81,18 @@ static void periodic_int(IRQn_Type id, void * data)
     handle_timeouts();
 }
 
+int trigger_sleep(uint32_t msec, volatile uint32_t * trigger)
+{
+    if(trigger)
+    {
+        uint64_t timeout = current_time + ((msec)*1000/TICK_TIMEOUT);
+        while(timeout >= current_time && *trigger == 0)
+            ;
+        return *trigger;
+    }
+    sleep(msec);
+    return 0;
+}    
 
 void sleep(uint32_t msec)
 {
@@ -109,5 +122,5 @@ void per_init(void)
     uart_init(TX_PIN, RX_PIN, BAUD, DATA_BITS, PARITY, STOP_BITS);
     stepper_init();
     buttons_init();
-    
+    commands_init();
 }

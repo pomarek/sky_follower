@@ -498,6 +498,11 @@
               <FileType>1</FileType>
               <FilePath>.\sources\Buttons.c</FilePath>
             </File>
+            <File>
+              <FileName>commands.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\sources\commands.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
